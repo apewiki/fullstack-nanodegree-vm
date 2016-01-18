@@ -6,8 +6,10 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
---DROP DATABASE IF EXISTS tournament;
---CREATE DATABASE tournament;
+DROP DATABASE IF EXISTS tournament;
+CREATE DATABASE tournament;
+
+\c tournament;
 
 DROP TABLE IF EXISTS players;
 CREATE TABLE players (
@@ -19,6 +21,9 @@ CREATE TABLE matches (
 id serial,
 points INTEGER,
 round INTEGER);
+
+DROP VIEW IF EXISTS views;
+
 --DELETE FROM players;
 INSERT INTO players (name) VALUES ('Qin');
 INSERT INTO players (name) VALUES ('Alex');
@@ -40,6 +45,8 @@ UPDATE matches SET round = round + 1 from players AS b WHERE matches.id = b.id a
 UPDATE matches SET points = points + 1, round = round + 1 from players AS b WHERE matches.id = b.id and b.name = 'Joe';
 UPDATE matches SET round = round + 1 from players AS b WHERE matches.id = b.id and b.name = 'Qin';
 
+CREATE VIEW standings (id, name, points, round) AS SELECT players.id, players.name, matches.points, matches.round from players, matches WHERE players.id = matches.id order by matches.round, matches.points DESC;
+
 --INSERT INTO matches (SELECT a.id, b.id, 1, 2 FROM players a, players b WHERE a.name = 'Alex' AND b.name = 'Joe');
 --INSERT INTO matches (SELECT a.id, b.id, 1, 1 FROM players a, players b WHERE a.name = 'Alex' AND b.name = 'Zeus');
 
@@ -48,3 +55,4 @@ SELECT * from players;
 SELECT * from matches;
 
 SELECT players.name, matches.points from players, matches WHERE matches.round = (SELECT max(round) FROM matches) AND players.id = matches.id order by matches.points DESC;
+SELECT * FROM standings;
