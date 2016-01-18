@@ -5,7 +5,8 @@
 from tournament import *
 
 def testDeleteMatches():
-    deleteMatches()
+    status = deleteMatches()
+    print status
     print "1. Old matches can be deleted."
 
 
@@ -62,6 +63,7 @@ def testStandingsBeforeMatches():
     registerPlayer("Melpomene Murray")
     registerPlayer("Randy Schwartz")
     standings = playerStandings()
+    print "In testStandingsBeforeMatches_______"
     if len(standings) < 2:
         raise ValueError("Players should appear in playerStandings even before "
                          "they have played any matches.")

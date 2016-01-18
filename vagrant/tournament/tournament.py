@@ -5,6 +5,7 @@
 
 import psycopg2
 
+num_players = 0
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
@@ -13,15 +14,47 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
-
+    db = connect()
+    if db:
+        cursor = db.cursor()
+        query="DELETE FROM matches;"
+        cursor.execute(query)
+        db.commit()
+        db.close()
+        return True
+    else:
+        print "db connection problem!"
+        return False
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    db = connect()
+    if db:
+        cursor = db.cursor()
+        query="DELETE FROM players;"
+        cursor.execute(query)
+        db.commit()
+        db.close()
+        return True
+    else:
+        print "db connection problem!"
+        return False
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
-
+    db = connect()
+    count = 0
+    if db:
+        cursor = db.cursor()
+        query = "SELECT COUNT(*) FROM players;"
+        cursor.execute(query)
+        rows = cursor.fetchone()
+        count = rows[0]
+        print rows
+        db.close()
+    return count    
+    
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -32,6 +65,21 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    db = connect()
+    if db:
+        cursor = db.cursor()
+        query = "INSERT INTO players (name) VALUES (%s) "
+        print query
+        cursor.execute(query, (name,))
+        db.commit()
+        query = "INSERT INTO matches (id, points, round) VALUES ((SELECT id FROM players WHERE name = %s), 0, 0)"
+        cursor.execute(query, (name,))
+        db.commit()
+        db.close()
+        return True
+    else:
+        return False
+
 
 
 def playerStandings():
@@ -47,6 +95,21 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    db = connect()
+    standings=()
+    if db:
+        cursor = db.cursor()
+        query = "SELECT players.id, players.name, matches.points, matches.round from players, matches WHERE players.id = matches.id order by matches.round, matches.points DESC;"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        for row in rows:
+            print row
+            standings += ((row[0], row[1], row[2], row[3]),)
+        db.close() 
+        print standings     
+    return standings
+
+
 
 
 def reportMatch(winner, loser):
@@ -56,6 +119,19 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    db = connect()
+    if db:
+        cursor = db.cursor()
+        query = "UPDATE matches SET points = points + 1, round = round + 1 WHERE matches.id = %s"
+        cursor.execute(query, (winner,))
+        query = "UPDATE matches SET round = round + 1 WHERE matches.id = %s"
+        cursor.execute(query, (loser,))
+        db.commit()
+        db.close()
+        return True
+    else:
+        return False
+
  
  
 def swissPairings():
@@ -73,5 +149,35 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    pairs = []
+    num_players = countPlayers()
+    db = connect()
+    if db:
+        cursor = db.cursor()
+        query = "SELECT max(round) FROM matches;"
+        cursor.execute(query)
+        curr_round = cursor.fetchone()[0]
+        db.close()
+    if not num_players%2:
+        print "Number of players must be even"
+    standings = playerStandings()
+    print "******"
+    print standings
+    if len(standings) != num_players * curr_round:
+        print "Current match is not finished yet"
+
+    pair_count = 0
+
+    pair = ()
+    for s in standings:
+        if s[3] == curr_round:
+            if len(pair)/2 < 2:
+                pair += (s[0], s[1],)
+            if pair_count % 2 == 1:
+                pairs.append(pair)
+                pair = ()
+            pair_count += 1
+    print pairs
+    return pairs
 
 
