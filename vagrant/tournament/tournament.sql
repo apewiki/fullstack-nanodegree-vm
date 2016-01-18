@@ -11,48 +11,24 @@ CREATE DATABASE tournament;
 
 \c tournament;
 
+--Create the table to store player information
 DROP TABLE IF EXISTS players;
 CREATE TABLE players (
 id serial PRIMARY KEY,
 name varchar(50) NOT NULL);
 
+--Create the table to store point for each player in each round
+--Points increment by 1 if player wins a round
 DROP TABLE IF EXISTS matches;
 CREATE TABLE matches (
 id serial,
 points INTEGER,
 round INTEGER);
 
+
+-- Create a view for standings that is sorted by desceding order
 DROP VIEW IF EXISTS views;
-
---DELETE FROM players;
-INSERT INTO players (name) VALUES ('Qin');
-INSERT INTO players (name) VALUES ('Alex');
-INSERT INTO players (name) VALUES ('Joe');
-INSERT INTO players (name) VALUES ('Zeus');
-INSERT INTO matches (SELECT a.id, 0, 0 FROM players a WHERE a.name = 'Alex');
-INSERT INTO matches (SELECT a.id, 0, 0 FROM players a WHERE a.name = 'Qin');
-INSERT INTO matches (SELECT a.id, 0, 0 FROM players a WHERE a.name = 'Joe');
-INSERT INTO matches (SELECT a.id, 0, 0 FROM players a WHERE a.name = 'Zeus');
-UPDATE matches SET points = points + 1, round = round + 1 from players AS b WHERE matches.id = b.id and b.name = 'Alex';
-UPDATE matches SET round = round + 1 from players AS b WHERE matches.id = b.id and b.name = 'Qin';
-
-UPDATE matches SET points = points + 1, round = round + 1 from players AS b WHERE matches.id = b.id and b.name = 'Zeus';
-UPDATE matches SET round = round + 1 from players AS b WHERE matches.id = b.id and b.name = 'Joe';
-
-UPDATE matches SET points = points + 1, round = round + 1 from players AS b WHERE matches.id = b.id and b.name = 'Alex';
-UPDATE matches SET round = round + 1 from players AS b WHERE matches.id = b.id and b.name = 'Zeus';
-
-UPDATE matches SET points = points + 1, round = round + 1 from players AS b WHERE matches.id = b.id and b.name = 'Joe';
-UPDATE matches SET round = round + 1 from players AS b WHERE matches.id = b.id and b.name = 'Qin';
-
-CREATE VIEW standings (id, name, points, round) AS SELECT players.id, players.name, matches.points, matches.round from players, matches WHERE players.id = matches.id order by matches.round, matches.points DESC;
-
---INSERT INTO matches (SELECT a.id, b.id, 1, 2 FROM players a, players b WHERE a.name = 'Alex' AND b.name = 'Joe');
---INSERT INTO matches (SELECT a.id, b.id, 1, 1 FROM players a, players b WHERE a.name = 'Alex' AND b.name = 'Zeus');
-
---DELETE FROM matches;
-SELECT * from players;
-SELECT * from matches;
-
-SELECT players.name, matches.points from players, matches WHERE matches.round = (SELECT max(round) FROM matches) AND players.id = matches.id order by matches.points DESC;
-SELECT * FROM standings;
+CREATE VIEW standings (id, name, points, round) 
+	AS SELECT players.id, players.name, matches.points, matches.round 
+	FROM players, matches WHERE players.id = matches.id 
+	ORDER BY matches.round, matches.points DESC;

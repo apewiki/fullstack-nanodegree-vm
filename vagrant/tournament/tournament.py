@@ -72,7 +72,10 @@ def registerPlayer(name):
         print query
         cursor.execute(query, (name,))
         db.commit()
-        query = "INSERT INTO matches (id, points, round) VALUES ((SELECT id FROM players WHERE name = %s), 0, 0)"
+        # When a player is registered but before each match,
+        # a record of 0 points and 0 round is inserted into matches table
+        query = ('INSERT INTO matches (id, points, round)'
+                 'VALUES ((SELECT id FROM players WHERE name = %s), 0, 0)')
         cursor.execute(query, (name,))
         db.commit()
         db.close()
@@ -99,7 +102,7 @@ def playerStandings():
     standings=()
     if db:
         cursor = db.cursor()
-        query = "SELECT players.id, players.name, matches.points, matches.round from players, matches WHERE players.id = matches.id order by matches.round, matches.points DESC;"
+        query = "SELECT id, name, points, round FROM standings;"
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
@@ -114,7 +117,8 @@ def playerStandings():
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
-
+       Increment points by 1 if the player wins.
+       Increment round for the player once result is in
     Args:
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
@@ -158,17 +162,16 @@ def swissPairings():
         cursor.execute(query)
         curr_round = cursor.fetchone()[0]
         db.close()
+    # Number of players have to be even
     if not num_players%2:
         print "Number of players must be even"
     standings = playerStandings()
-    print "******"
-    print standings
+    # This check is to avoid pairing where a round of match is not yet finished
     if len(standings) != num_players * curr_round:
         print "Current match is not finished yet"
-
     pair_count = 0
-
     pair = ()
+    #Assign pair for players with equal or closest points
     for s in standings:
         if s[3] == curr_round:
             if len(pair)/2 < 2:
