@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-# 
+#
 # tournament.py -- implementation of a Swiss-system tournament
 #
 
 import psycopg2
 
-num_players = 0
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
@@ -17,7 +16,7 @@ def deleteMatches():
     db = connect()
     if db:
         cursor = db.cursor()
-        query="DELETE FROM matches;"
+        query = "DELETE FROM matches;"
         cursor.execute(query)
         db.commit()
         db.close()
@@ -26,12 +25,13 @@ def deleteMatches():
         print "db connection problem!"
         return False
 
+
 def deletePlayers():
     """Remove all the player records from the database."""
     db = connect()
     if db:
         cursor = db.cursor()
-        query="DELETE FROM players;"
+        query = "DELETE FROM players;"
         cursor.execute(query)
         db.commit()
         db.close()
@@ -51,17 +51,16 @@ def countPlayers():
         cursor.execute(query)
         rows = cursor.fetchone()
         count = rows[0]
-        print rows
         db.close()
-    return count    
-    
+    return count
+
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
-  
+
     The database assigns a unique serial id number for the player.  (This
     should be handled by your SQL database schema, not in your Python code.)
-  
+
     Args:
       name: the player's full name (need not be unique).
     """
@@ -69,7 +68,6 @@ def registerPlayer(name):
     if db:
         cursor = db.cursor()
         query = "INSERT INTO players (name) VALUES (%s) "
-        print query
         cursor.execute(query, (name,))
         db.commit()
         # When a player is registered but before each match,
@@ -84,12 +82,11 @@ def registerPlayer(name):
         return False
 
 
-
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
 
-    The first entry in the list should be the player in first place, or a player
-    tied for first place if there is currently a tie.
+    The first entry in the list should be the player in first place, or
+    a player tied for first place if there is currently a tie.
 
     Returns:
       A list of tuples, each of which contains (id, name, wins, matches):
@@ -99,20 +96,16 @@ def playerStandings():
         matches: the number of matches the player has played
     """
     db = connect()
-    standings=()
+    standings = ()
     if db:
         cursor = db.cursor()
         query = "SELECT id, name, points, round FROM standings;"
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
-            print row
             standings += ((row[0], row[1], row[2], row[3]),)
-        db.close() 
-        print standings     
+        db.close()
     return standings
-
-
 
 
 def reportMatch(winner, loser):
@@ -126,7 +119,8 @@ def reportMatch(winner, loser):
     db = connect()
     if db:
         cursor = db.cursor()
-        query = "UPDATE matches SET points = points + 1, round = round + 1 WHERE matches.id = %s"
+        query = ('UPDATE matches SET points = points + 1, round = round + 1'
+                 'WHERE matches.id = %s')
         cursor.execute(query, (winner,))
         query = "UPDATE matches SET round = round + 1 WHERE matches.id = %s"
         cursor.execute(query, (loser,))
@@ -136,16 +130,15 @@ def reportMatch(winner, loser):
     else:
         return False
 
- 
- 
+
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
-  
+
     Assuming that there are an even number of players registered, each player
     appears exactly once in the pairings.  Each player is paired with another
     player with an equal or nearly-equal win record, that is, a player adjacent
     to him or her in the standings.
-  
+
     Returns:
       A list of tuples, each of which contains (id1, name1, id2, name2)
         id1: the first player's unique id
@@ -163,7 +156,7 @@ def swissPairings():
         curr_round = cursor.fetchone()[0]
         db.close()
     # Number of players have to be even
-    if not num_players%2:
+    if num_players % 2 != 0:
         print "Number of players must be even"
     standings = playerStandings()
     # This check is to avoid pairing where a round of match is not yet finished
@@ -171,7 +164,7 @@ def swissPairings():
         print "Current match is not finished yet"
     pair_count = 0
     pair = ()
-    #Assign pair for players with equal or closest points
+    # Assign pair for players with equal or closest points
     for s in standings:
         if s[3] == curr_round:
             if len(pair)/2 < 2:
@@ -180,7 +173,4 @@ def swissPairings():
                 pairs.append(pair)
                 pair = ()
             pair_count += 1
-    print pairs
     return pairs
-
-
