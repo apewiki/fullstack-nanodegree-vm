@@ -21,7 +21,8 @@ name varchar(50) NOT NULL);
 --Points increment by 1 if player wins a round
 DROP TABLE IF EXISTS matches;
 CREATE TABLE matches (
-id serial,
+recordId serial PRIMARY KEY,
+id serial REFERENCES players(id) ON DELETE CASCADE,
 points INTEGER,
 round INTEGER);
 

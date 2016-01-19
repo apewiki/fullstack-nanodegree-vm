@@ -8,50 +8,41 @@ import psycopg2
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+    try:
+        db = psycopg2.connect("dbname=tournament")
+        cursor = db.cursor()
+        return db, cursor
+    except:
+        print "Problem with database connection!"
 
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    db = connect()
-    if db:
-        cursor = db.cursor()
-        query = "DELETE FROM matches;"
-        cursor.execute(query)
-        db.commit()
-        db.close()
-        return True
-    else:
-        print "db connection problem!"
-        return False
+    db, cursor = connect()
+    query = "DELETE FROM matches;"
+    cursor.execute(query)
+    db.commit()
+    db.close()
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    db = connect()
-    if db:
-        cursor = db.cursor()
-        query = "DELETE FROM players;"
-        cursor.execute(query)
-        db.commit()
-        db.close()
-        return True
-    else:
-        print "db connection problem!"
-        return False
+    db, cursor = connect()
+    query = "DELETE FROM players;"
+    cursor.execute(query)
+    db.commit()
+    db.close()
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    db = connect()
+    db, cursor = connect()
     count = 0
-    if db:
-        cursor = db.cursor()
-        query = "SELECT COUNT(*) FROM players;"
-        cursor.execute(query)
-        rows = cursor.fetchone()
-        count = rows[0]
-        db.close()
+    query = "SELECT COUNT(*) FROM players;"
+    cursor.execute(query)
+    rows = cursor.fetchone()
+    count = rows[0]
+    db.close()
     return count
 
 
@@ -64,22 +55,17 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    db = connect()
-    if db:
-        cursor = db.cursor()
-        query = "INSERT INTO players (name) VALUES (%s) "
-        cursor.execute(query, (name,))
-        db.commit()
-        # When a player is registered but before each match,
-        # a record of 0 points and 0 round is inserted into matches table
-        query = ('INSERT INTO matches (id, points, round)'
-                 'VALUES ((SELECT id FROM players WHERE name = %s), 0, 0)')
-        cursor.execute(query, (name,))
-        db.commit()
-        db.close()
-        return True
-    else:
-        return False
+    db, cursor = connect()
+    query = "INSERT INTO players (name) VALUES (%s) "
+    cursor.execute(query, (name,))
+    db.commit()
+    # When a player is registered but before each match,
+    # a record of 0 points and 0 round is inserted into matches table
+    query = ('INSERT INTO matches (id, points, round)'
+             'VALUES ((SELECT id FROM players WHERE name = %s), 0, 0)')
+    cursor.execute(query, (name,))
+    db.commit()
+    db.close()
 
 
 def playerStandings():
@@ -95,16 +81,13 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    db = connect()
+    db, cursor = connect()
     standings = ()
-    if db:
-        cursor = db.cursor()
-        query = "SELECT id, name, points, round FROM standings;"
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        for row in rows:
-            standings += ((row[0], row[1], row[2], row[3]),)
-        db.close()
+    query = "SELECT id, name, points, round FROM standings;"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    standings = [(row[0], row[1], row[2], row[3]) for row in rows]
+    db.close()
     return standings
 
 
@@ -116,19 +99,14 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-    db = connect()
-    if db:
-        cursor = db.cursor()
-        query = ('UPDATE matches SET points = points + 1, round = round + 1'
-                 'WHERE matches.id = %s')
-        cursor.execute(query, (winner,))
-        query = "UPDATE matches SET round = round + 1 WHERE matches.id = %s"
-        cursor.execute(query, (loser,))
-        db.commit()
-        db.close()
-        return True
-    else:
-        return False
+    db, cursor = connect()
+    query = ('UPDATE matches SET points = points + 1, round = round + 1'
+             'WHERE matches.id = %s')
+    cursor.execute(query, (winner,))
+    query = "UPDATE matches SET round = round + 1 WHERE matches.id = %s"
+    cursor.execute(query, (loser,))
+    db.commit()
+    db.close()
 
 
 def swissPairings():
@@ -148,13 +126,11 @@ def swissPairings():
     """
     pairs = []
     num_players = countPlayers()
-    db = connect()
-    if db:
-        cursor = db.cursor()
-        query = "SELECT max(round) FROM matches;"
-        cursor.execute(query)
-        curr_round = cursor.fetchone()[0]
-        db.close()
+    db, cursor = connect()
+    query = "SELECT max(round) FROM matches;"
+    cursor.execute(query)
+    curr_round = cursor.fetchone()[0]
+    db.close()
     # Number of players have to be even
     if num_players % 2 != 0:
         print "Number of players must be even"
