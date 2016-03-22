@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block body %}
+	{% if allow_edit %}
+		<a href="{{url_for('addItem', category_id = category.id)}}">Add New Item</a>
+		<br><br>
+	{% endif %}
+	<h2>{{category.name}}({{num_items}})</h2>
+	{% for i in items %}
+		<a href="{{url_for('showItem', category_id = i.category_id, item_id = i.id)}}">{{i.name}}</a>
+		<br>
+		<a href="{{url_for('editItem', category_id = i.category_id, item_id = i.id)}}">Edit</a>
+		<a href="{{url_for('deleteItem', category_id = i.category_id, item_id = i.id)}}">Delete</a>
+		<br>
+	{% endfor %}
+{% endblock %}
