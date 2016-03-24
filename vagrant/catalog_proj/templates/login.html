@@ -1,0 +1,59 @@
+<!Doctype html>
+<html>
+	<head>
+		<title>Login</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script></script>
+		<script src="https://apis.google.com/js/platform.js" async defer></script>
+	</head>
+	<body>
+		<div id = 'signinButton'>
+			<span class = 'g-signin'
+				data-scope = 'openid email'
+				data-clientid = '725677487532-dl947b38g4bbbcrivsg87nbd71bntl2c'
+				data-redirect = 'postmessage'
+				data-accesstype = 'offlike'
+				data-cookiepolicy = 'single_host_origin'
+				data-callback = 'signInCallBack'
+				data-approvalpromp = 'force'>
+			</span>
+		</div>
+
+		<div>
+			<button class = 'btn btn-default' id = 'new-menu-tem'>
+				<fb:login-button scope = 'public_profile, email' onlogin = 'sendTokenToServer();'>
+					<a href="javascript:sendTokenToServer()">Login with Facebook</a>
+				</fb:login-button>
+			</button>
+		</div>
+
+		<div id = "result"></div>
+
+		<script>
+			function signInCallBack(authResult) {
+				if (authResult['code']) {
+					// login successful, hide login button
+					$('#SigninButton').attr('style', 'display:none');
+					$.ajax({
+						type: 'POST',
+						url: '/gconnect?state={{STATE}}',
+						processData: false,
+						contentType: 'application/octet-stream; charset-utf-8',
+						data: authResult['code'],
+						success: function(result) {
+							if (result) {
+								$('#result').html('Login successful!<br>' + result + '<br> Redirecting...');
+								setTimeout(function() {
+									window.location.href = '/catalog';
+								}, 4000);
+							} else if (authResult['error']) {
+								console.log('There was an error: ' + authResult['error']);
+							} else {
+								$('#result').html('Failed server side call, check your configuration and console');
+							}
+						}
+					});
+				}
+			}
+		</script>
+	</body>
+</html>

@@ -16,12 +16,14 @@ class User(Base):
 	@property
 	def serialize(self):
 		return {
-			'id': self.id,
-			'name': self.name,
-			'email': self.email,
-			'picture': self.picture
+		'id': self.id,
+		'name': self.name,
+		'email': self.email,
+		'picture': self.picture
 		}
 
+	
+	
 class Category(Base):
 	__tablename__ = 'category'
 

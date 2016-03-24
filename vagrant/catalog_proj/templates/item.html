@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
 	
-
+	<a href="{{url_for('showItems', category_id = item.category_id)}}">Back to Category</a>
 	<h2>{{item.name}}</h2>
 	{{item.description}}
 	<br>
