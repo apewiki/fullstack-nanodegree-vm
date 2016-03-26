@@ -1,5 +1,10 @@
 <html>
 <a href="/">HOME</a>
+{% if 'username' in session %}
+	<a href="{{url_for('disconnect')}}">Logout</a>
+{% else %}
+	<a href="{{url_for('showLogin')}}">Login</a>
+{% endif %}
 {% with msg = get_flashed_messages() %}
 	{% if msg %}
 		<ul>
