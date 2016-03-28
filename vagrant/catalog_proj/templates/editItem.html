@@ -21,22 +21,22 @@
 			}
 		}
 	</script>
-	<a href="{{url_for('showItems', category_id = category_id)}}">Back to Category</a>
-	<form action = "{{url_for('editItem', category_id = category_id, item_id = item.id)}}" method = 'POST'>
+	<a href="{{url_for('showItems', category_name = category_name)}}">Back to Category</a>
+	<form action = "{{url_for('editItem', item_name = item.name)}}" method = 'POST'>
 		<h2>Title</h2>
 		<input type = "text" name = "itemName" placeholder = "{{item.name}}" id = "itemTitle">
 		<br>
 		<h2>Description</h2>
 		<textarea rows = '4' cols = '50' name = 'itemDescription'>{{item.description}}</textarea>
 		<h2>Price</h2>
-		<input type = 'text' name = 'itemPrice' placeholder = "{{item.price}}">
+		<input type = 'text' name = 'itemPrice' value = "{{item.price}}">
 		<h2>Choose/Input Image file</h2>
 		<input type = 'file' id = 'itemImgFile' onchange = 'chooseFile()'>
 		<input type = 'text' id = 'itemImageFileName' name = 'itemImageFile' value = '{{item.picture}}'>
 		<h2>Category</h2>
 		<select name = 'itemCategory'>
 			{% for c in categories %}
-				{% if c.id == category_id %}
+				{% if c.id == item.category_id %}
 					<option value = '{{c.name}}' selected>{{c.name}}</option>
 				{% else %}
 					<option value = '{{c.name}}'>{{c.name}}</option>
@@ -45,7 +45,7 @@
 		</select>
 		<br><br>
 		<input type = 'submit' value = 'submit' onclick = 'return checkForm()'>
-		<a href="{{url_for('showItems', category_id = category_id)}}">Cancel</a>
+		<a href="{{url_for('showItems', category_name = category_name)}}">Cancel</a>
 	</form>
 
 {% endblock %}

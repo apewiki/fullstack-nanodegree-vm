@@ -27,6 +27,9 @@ APPLICATION_NAME = 'spotscatalog'
 def getCategory(category_id):
 	return session.query(Category).filter_by(id = category_id).first()
 
+def getCategoryByName(category_name):
+	return session.query(Category).filter_by(name = category_name).first()
+
 def getAllCategories():
 	return session.query(Category).all()
 
@@ -71,37 +74,38 @@ def showCatalog():
 							recentItems = recentItems, allow_edit = allow_edit)
 
 
-@app.route('/catalog/<int:category_id>/')
-@app.route('/catalog/<int:category_id>/item')
-def showItems(category_id):
+@app.route('/catalog/<category_name>')
+def showItems(category_name):
 	allow_edit = False
 	print login_session
-	if 'username' in login_session:
+	if 'user_id' in login_session:
 		print login_session['username']
 		print login_session['user_id']
 		allow_edit = True
-	category = getCategory(category_id = category_id)
+	category = getCategoryByName(category_name = category_name)
 	categories = getAllCategories()
-	items = session.query(Item).filter_by(category_id = category_id).all()
+	items = session.query(Item).filter_by(category_id = category.id).all()
 	return render_template('category.html', category  = category, 
 							categories = categories,
 							num_items = len(items), items= items, allow_edit = allow_edit)
 
-@app.route('/catalog/<int:category_id>/item/<int:item_id>/')
-def showItem(category_id, item_id):
+@app.route('/catalog/<category_name>/<item_name>/')
+def showItem(category_name, item_name):
 	allow_edit = False
-	c = session.query(Category).filter_by(id = category_id).first()
-	i = session.query(Item).filter_by(category_id = category_id, id = item_id).first()
+	c = getCategoryByName(category_name)
+	i = session.query(Item).filter_by(name = item_name).first()
 	showPic = False
 	if i.picture and len(i.picture) > 0 and i.picture.endswith('jpg'):
 		showPic = True
 	if 'user_id' in login_session:
 		allow_edit = (login_session['user_id'] == i.user_id)
+		print "user %s is allowed to edit" % login_session['username']
+		print allow_edit
 	return render_template('item.html', category = c, item = i, 
 							allow_edit = allow_edit, showPic = showPic)
 
-@app.route('/catalog/<int:category_id>/new', methods = ['GET', 'POST'])
-def addItem(category_id):
+@app.route('/catalog/new', methods = ['GET', 'POST'])
+def addItem():
 	if 'user_id' not in login_session:
 		flash('Please login to add item.')
 		return redirect(url_for('/login'))
@@ -109,9 +113,9 @@ def addItem(category_id):
 		selectedCategory = str(request.form['selectedCategory'])
 		print selectedCategory
 
-		new_category_id = session.query(Category).filter_by(name = selectedCategory).first().id
-		if new_category_id:
-			category_id = new_category_id
+		new_category = session.query(Category).filter_by(name = selectedCategory).first()
+		if new_category:
+			category_id = new_category.id
 			print category_id
 
 		newItem = Item(name = request.form['itemName'], 
@@ -123,48 +127,49 @@ def addItem(category_id):
 		session.add(newItem)
 		session.commit()
 		flash('New item is added!')
-		return redirect(url_for('showItems', category_id = category_id))
+		return redirect(url_for('showItems', category_name = new_category.name))
 	else:
 		categories = getAllCategories()
-		category = getCategory(category_id)
-		return render_template('newItem.html', categories = categories, category = category)
+		#category = getCategoryByName(category_name)
+		return render_template('newItem.html', categories = categories)
 
-@app.route('/catalog/<int:category_id>/item/<int:item_id>/edit', methods = ['GET', 'POST'])
-def editItem(category_id, item_id):
-	item = session.query(Item).filter_by(category_id = category_id, id = item_id).first()
+@app.route('/catalog/<item_name>/edit', methods = ['GET', 'POST'])
+def editItem(item_name):
+	category, item = session.query(Category, Item).filter(Category.id == Item.category_id, 
+		Item.name == item_name).first()
 	categories = getAllCategories()
 	if request.method == 'POST':
 		item.name = request.form['itemName']
 		item.description = request.form['itemDescription']
 		item.picture = request.form['itemImageFile']
 		item.price = request.form['itemPrice']
-		new_category_id = session.query(Category).filter_by(name = request.form['itemCategory']).first().id
-		if new_category_id:
-			category_id = new_category_id
-			item.category_id = new_category_id
-		if item.name and new_category_id:
+		new_category = session.query(Category).filter_by(name = request.form['itemCategory']).first()
+		if new_category:
+			category_id = new_category.id
+			item.category_id = new_category.id
+		if item.name and item.category_id:
 			session.commit()
 			flash('Item %s has been modified!' % item.name)
-			return redirect(url_for('showItems', category_id = category_id))
+			return redirect(url_for('showItems', category_name = new_category.name))
 		else:
 			flash('Please input title of the item and select category.')
 			return render_template('editItem.html', categories = categories, 
-								category_id = category_id, item = item)
+								category_name = new_category.name, item = item)
 	else:
 		return render_template('editItem.html', categories = categories, 
-								category_id = category_id, item = item)
+								category_name = category.name, item = item)
 
-@app.route('/catalog/<int:category_id>/item/<int:item_id>/delete', methods = ['GET', 'POST'])
-def deleteItem(category_id, item_id):
-	item = session.query(Item).filter_by(category_id = category_id, id = item_id).first()
-	name = item.name
+@app.route('/catalog/<item_name>/delete', methods = ['GET', 'POST'])
+def deleteItem(item_name):
+	category, item = session.query(Category, Item).filter(Category.id == Item.category_id, 
+		Item.name == item_name).first()
 	if request.method == 'POST':
 		session.delete(item)
 		session.commit()
-		flash("Item %s has been deleted!" % name)
-		return redirect(url_for('showItems', category_id = category_id))
+		flash("Item %s has been deleted!" % category.name)
+		return redirect(url_for('showItems', category_name = category.name))
 	else:
-		return render_template('deleteItem.html', category_id = category_id, item = item)
+		return render_template('deleteItem.html', category_name = category.name, item = item)
 
 @app.route('/catalog/<int:category_id>/item/JSON')
 def categoryItemsJSON(category_id):
@@ -254,6 +259,8 @@ def gconnect():
 	params = {'access_token':credentials.access_token, 'alt':'json'}
 	answer = requests.get(userinfo_url, params = params)
 	data = json.loads(answer.text)
+	print "in google+ login...."
+	print data
 
 	login_session['username'] = data['name']
 	login_session['picture'] = data['picture']
@@ -393,7 +400,8 @@ def gdisconnect():
 		response = make_response(json.dumps('Current user is not connected.'), 401)
 		response.headers['Content-Type'] = 'application/json'
 		return response
-	
+	del login_session['access_token']
+	del login_session['gplus_id']
 	url = "https://accounts.google.com/o/oauth2/revoke?token=%s" % access_token
 	h = httplib2.Http()
 	result = h.request(url, 'GET')[0]
@@ -401,8 +409,8 @@ def gdisconnect():
 
 	if result['status'] == '200':
 		#reset the user's sessiion
-		del login_session['access_token']
-		del login_session['gplus_id']
+		#del login_session['access_token']
+		#del login_session['gplus_id']
 
 		response = make_response(json.dumps('Successfully disconnected.'), 200)
 		response.headers['Content-Type'] = 'application/json'

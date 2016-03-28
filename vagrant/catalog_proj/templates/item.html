@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
 	
-	<a href="{{url_for('showItems', category_id = item.category_id)}}">Back to Category</a>
+	<a href="{{url_for('showItems', category_name = category.name)}}">Back to Category</a>
 	<h2>{{item.name}}</h2>
 	{{item.description}}
 	<br>
@@ -9,10 +9,11 @@
 		<img src="/static/images/{{item.picture}}">
 	{% endif %}
 	<br>
-	price: {{item.price}}
+	<h3>price: </h3>
+	{{item.price}}
 	<br>
 	{% if allow_edit %}
-		<a href="{{url_for('editItem', category_id = item.category_id, item_id = item.id)}}">Edit</a>|
-		<a href="{{url_for('deleteItem', category_id = item.category_id, item_id = item.id)}}">Delete</a>
+		<a href="{{url_for('editItem', item_name = item.name)}}">Edit</a>|
+		<a href="{{url_for('deleteItem', item_name = item.name)}}">Delete</a>
 	{% endif %}
 {% endblock %}

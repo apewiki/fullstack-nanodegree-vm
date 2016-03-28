@@ -21,7 +21,7 @@
 			}
 		}
 	</script>
-	<form action = "{{url_for('addItem', categories = categories, category_id = category.id)}}" method = 'POST'>
+	<form action = "{{url_for('addItem', categories = categories)}}" method = 'POST'>
 		<h2>Title</h2>
 		<input type = 'text' name = 'itemName' id = 'newItemTitle'>
 		<br>
@@ -35,16 +35,12 @@
 		<h2>Category</h2>
 		<select name = 'selectedCategory'>
 			{% for c in categories %}
-				{% if category.id == c.id %}
-					<option value = '{{c.name}}' selected>{{c.name}}</option>
-				{% else %}
-					<option value = '{{c.name}}'>{{c.name}}</option>
-				{% endif %}
+				<option value = '{{c.name}}' selected>{{c.name}}</option>
 			{% endfor %}
 		</select>
 		<br><br>
 		<input type = 'submit' value = 'Submit' onClick = 'return checkForm()'>
-		<a href="{{url_for('showItems', category_id = category.id)}}">Cancel</a>
+		<a href="{{url_for('showCatalog')}}">Cancel</a>
 	</form>
 	
 {% endblock %}
