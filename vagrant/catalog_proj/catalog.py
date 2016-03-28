@@ -52,14 +52,23 @@ def getUserID(login_session):
 	else:
 		return None
 
+@app.route('/example')
+def exmaple():
+	return render_template('example.html')
+
 @app.route('/')
 @app.route('/catalog/')
 def showCatalog():
+	allow_edit = False
+	if 'user_id' in login_session:
+		allow_edit = True
 	categories = session.query(Category).all()
-	recentItems = session.query(Category.name, Item).filter(Category.id == Item.category_id).order_by(Item.date_added.desc()).limit(5)
+	recentItems = session.query(Category.name, Item).filter(Category.id 
+								== Item.category_id).order_by(Item.date_added.desc()).limit(5)
 	print recentItems
-	flash('Testing flash!')
-	return render_template('catalog.html', categories = categories, recentItems = recentItems)
+	#flash('Testing flash!')
+	return render_template('catalog.html', categories = categories, 
+							recentItems = recentItems, allow_edit = allow_edit)
 
 
 @app.route('/catalog/<int:category_id>/')
@@ -72,8 +81,10 @@ def showItems(category_id):
 		print login_session['user_id']
 		allow_edit = True
 	category = getCategory(category_id = category_id)
+	categories = getAllCategories()
 	items = session.query(Item).filter_by(category_id = category_id).all()
 	return render_template('category.html', category  = category, 
+							categories = categories,
 							num_items = len(items), items= items, allow_edit = allow_edit)
 
 @app.route('/catalog/<int:category_id>/item/<int:item_id>/')

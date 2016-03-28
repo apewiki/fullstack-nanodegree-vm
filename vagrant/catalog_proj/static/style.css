@@ -1,0 +1,62 @@
+a {
+	color:  #F69E1A;
+	font-weight: bold;
+}
+
+a:link {
+	text-decoration: none;
+}
+
+a:hover {
+	color: blue;
+}
+
+a:active {
+	color: #00004d;
+}
+
+h2 {
+	color: #13154E;
+}
+
+.header {
+	background-color: #13154E;
+	font-size: 40px;
+	font-weight: bold;
+}
+
+.header a {
+	color: white;
+}
+
+.header a:hover {
+	color: blue;
+}
+
+.login {
+	margin: 10px 10px 5px;
+	padding: 0 5px 0 5px;
+	float: right;
+	background-color: #F69E1A;
+	font-size: 15px;
+}
+
+.login a {
+	color: white;
+}
+
+.login a:hover {
+	color: blue;
+}
+
+.divider {
+	border-left: 2px solid #7F7E7C;
+}
+
+.itemCategory {
+	color: #7F7E7C;
+}
+
+.selectedCategory {
+	color: blue;
+}

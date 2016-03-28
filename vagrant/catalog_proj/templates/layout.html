@@ -1,10 +1,21 @@
+<!DOCTYPE html>
 <html>
-<a href="/">HOME</a>
-{% if 'username' in session %}
-	<a href="{{url_for('disconnect')}}">Logout</a>
-{% else %}
-	<a href="{{url_for('showLogin')}}">Login</a>
-{% endif %}
+<head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename = 'style.css')}}">
+</head>
+<div class = 'header'>
+	<a href="/">Catalog App</a>
+	<div class = 'login'>
+		{% if 'username' in session %}
+			<a href="{{url_for('disconnect')}}">Logout</a>
+		{% else %}
+			<a href="{{url_for('showLogin')}}">Login</a>
+		{% endif %}
+	</div>
+</div>
+
 {% with msg = get_flashed_messages() %}
 	{% if msg %}
 		<ul>
@@ -14,5 +25,8 @@
 		</ul>
 	{% endif %}
 {% endwith %}
-{% block body %}{% endblock %}
+<div class="container">
+	{% block body %}
+	{% endblock %}
+</div>
 </html>

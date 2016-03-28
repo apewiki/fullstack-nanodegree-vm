@@ -1,18 +1,36 @@
 {% extends "layout.html" %}
 {% block body %}
-	<h2>Categories</h2>
-	<div>
-		{% for c in  categories %}
-			<a href="{{url_for('showItems', category_id = c.id)}}">{{c.name}}</a>
-			<br>
-		{% endfor %}
-	</div>
-	<br>
-	<h2>Latest Additions</h2>
-	<div>
-		{% for i in recentItems %}
-			<a href="{{url_for('showItem', category_id = i[1].category_id, item_id = i[1].id)}}">{{i[1].name}}</a><span>({{i[0]}})</span>
-			<br>
-		{% endfor %}
+	<div class = "row">
+		<div class = "col-xs-3 col-md-2">
+			<h2>Categories</h2>
+			<div class = "category">
+				{% for c in  categories %}
+					<a href="{{url_for('showItems', category_id = c.id)}}">{{c.name}}</a>
+					<br>
+				{% endfor %}
+				<br>
+			</div>
+		</div>
+
+		<div class = "col-xs-9 col-md-10 divider">
+			{% if allow_edit %}
+				<div class = "row">
+					<div class = "col-md-12">
+						<a href="{{url_for('addItem', category_id = 1)}}">Add Item</a>
+					</div>
+				</div>
+			{% endif %}
+			<div class = "row">
+				<div class = "col-md-12">
+				<h2>Latest Additions</h2>
+					<div>
+						{% for i in recentItems %}
+							<a href="{{url_for('showItem', category_id = i[1].category_id, item_id = i[1].id)}}">{{i[1].name}}</a><span class = "itemCategory">({{i[0]}})</span>
+							<br>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 {% endblock %}
