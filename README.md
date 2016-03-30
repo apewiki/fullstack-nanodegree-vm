@@ -1,14 +1,25 @@
-To run the program, please follow the procedures below:
-- Install Vagrant
-- Run 'vagrant up' in vagrant directory
-- Run 'vagrant ssh'
-- cd /vagrant
-- cd catalog_proj
-- python database.py
-- python populateItems.py
-- python catalog.py
+## To run the program, please follow the procedures below:
+* git clone https://github.com/apewiki/fullstack-nanodegree-vm.git
+* Install Vagrant
+* Run 'vagrant up' in vagrant directory
+* Run 'vagrant ssh'
+* cd /vagrant
+* cd catalog_proj
 
-Description:
+1. Database setup
+```
+python database.py
+```
+2. Populate databse with some records
+```
+python populateItems.py
+```
+3. Start the app
+```
+python catalog.py
+```
+
+## Description:
 There are a four categories in the catalog. Each category is populated with a few items. 
 You will not be able to edit these items because they were not created by you.
 To  add/Edit/Delete items, please follow the procedures described below.
