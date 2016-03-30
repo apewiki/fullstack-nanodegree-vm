@@ -5,7 +5,7 @@
 			<h2>Categories</h2>
 			<div class = "category">
 				{% for c in  categories %}
-					<a href="{{url_for('showItems', category_name = c.name)}}">{{c.name}}</a>
+					<a href="{{url_for('show_items', category_name = c.name)}}">{{c.name}}</a>
 					<br>
 				{% endfor %}
 				<br>
@@ -16,7 +16,7 @@
 			{% if allow_edit %}
 				<div class = "row">
 					<div class = "col-md-12">
-						<a href="{{url_for('addItem')}}">Add Item</a>
+						<a href="{{url_for('add_item')}}">Add Item</a>
 					</div>
 				</div>
 			{% endif %}
@@ -25,7 +25,7 @@
 				<h2>Latest Additions</h2>
 					<div>
 						{% for i in recentItems %}
-							<a href="{{url_for('showItem', category_name = i[0], item_name = i[1].name)}}">{{i[1].name}}</a><span class = "itemCategory">({{i[0]}})</span>
+							<a href="{{url_for('show_item', category_name = i[0], item_name = i[1].name)}}">{{i[1].name}}</a><span class = "itemCategory">({{i[0]}})</span>
 							<br>
 						{% endfor %}
 					</div>

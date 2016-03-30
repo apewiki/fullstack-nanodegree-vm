@@ -21,7 +21,7 @@
 			}
 		}
 	</script>
-	<form action = "{{url_for('addItem', categories = categories)}}" method = 'POST'>
+	<form action = "{{url_for('add_item', categories = categories)}}" method = 'POST'>
 		<h2>Title</h2>
 		<input type = 'text' name = 'itemName' id = 'newItemTitle'>
 		<br>
@@ -40,7 +40,7 @@
 		</select>
 		<br><br>
 		<input type = 'submit' value = 'Submit' onClick = 'return checkForm()'>
-		<a href="{{url_for('showCatalog')}}">Cancel</a>
+		<a href="{{url_for('show_catalog')}}">Cancel</a>
 	</form>
 	
 {% endblock %}

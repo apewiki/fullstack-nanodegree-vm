@@ -28,19 +28,32 @@ CLIENT_ID = json.loads(
 APPLICATION_NAME = 'spotscatalog'
 
 
-def getCategory(category_id):
-    return session.query(Category).filter_by(id=category_id).first()
+def get_category(category_name):
+    """Retrieve specified category
 
+    Args:
+        category_name: name of selected category
 
-def getCategoryByName(category_name):
+    Returns:
+        category object matching argument
+    """
     return session.query(Category).filter_by(name=category_name).first()
 
 
-def getAllCategories():
+def get_all_categories():
+    """Retrieve all categories from database."""
     return session.query(Category).all()
 
 
-def createUser(login_session):
+def create_user(login_session):
+    """Create new user in database and provide user id
+
+    Args:
+        login_session: session variable
+
+    Returns:
+        user id
+    """
     newUser = User(
         name=login_session['username'],
         picture=login_session.get('picture'),
@@ -51,7 +64,15 @@ def createUser(login_session):
     return user.id
 
 
-def getUserID(login_session):
+def get_userid(login_session):
+    """Retrieve user id from database for the user with matching email
+
+    Args:
+        login_session: session variable.
+
+    Returns:
+        Stored user id or None if user is not found
+    """
     user = session.query(User).filter_by(email=login_session['email']).first()
     if user:
         return user.id
@@ -59,13 +80,13 @@ def getUserID(login_session):
         return None
 
 
-# Top level navigation. Show 5 most recent items
 @app.route('/')
 @app.route('/catalog/')
-def showCatalog():
+def show_catalog():
+    """Retrieve all categories in the catalog with newest 5 items."""
     allow_edit = False
     if 'user_id' in login_session:
-        allow_edit = True
+        allow_edit = True    # Show link to add item if user is logged in.
     categories = session.query(Category).all()
     recentItems = session.query(Category.name, Item).filter(
         Category.id == Item.category_id).order_by(
@@ -75,29 +96,45 @@ def showCatalog():
         allow_edit=allow_edit)
 
 
-# Show a selected category onn the right
 @app.route('/catalog/<category_name>')
-def showItems(category_name):
+def show_items(category_name):
+    """Retrieve items in selected category.
+
+    Args:
+        category_name: name of the selected category.
+
+    Returns:
+        Catalog page with items in the selected category.
+    """
     allow_edit = False
     if 'user_id' in login_session:
         allow_edit = True
-    category = getCategoryByName(category_name=category_name)
-    categories = getAllCategories()
+    category = get_category(category_name=category_name)
+    categories = get_all_categories()
     items = session.query(Item).filter_by(category_id=category.id).all()
     return render_template(
         'category.html', category=category, categories=categories,
         num_items=len(items), items=items, allow_edit=allow_edit)
 
 
-# Show a selected item in a categrory
 @app.route('/catalog/<category_name>/<item_name>/')
-def showItem(category_name, item_name):
+def show_item(category_name, item_name):
+    """Retrieve specified item in a category.
+
+    Args:
+        category_name: name of the category of the item
+        item_name: name of the selected item.
+
+    Returns:
+        Item page.
+    """
     allow_edit = False
-    c = getCategoryByName(category_name)
+    c = get_category(category_name)
     i = session.query(Item).filter_by(name=item_name).first()
     showPic = False
     if i.picture and len(i.picture) > 0 and i.picture.endswith('jpg'):
         showPic = True
+    # Show edit/delete link if user is logged in
     if 'user_id' in login_session:
         allow_edit = (login_session['user_id'] == i.user_id)
     return render_template(
@@ -105,9 +142,13 @@ def showItem(category_name, item_name):
         allow_edit=allow_edit, showPic=showPic)
 
 
-# Add a new item or return to catalog page. Need to login to access.
 @app.route('/catalog/new', methods=['GET', 'POST'])
-def addItem():
+def add_item():
+    """Add new item.
+
+    Returns:
+        Category page if new item is submitted otherwise new entry form
+    """
     if 'user_id' not in login_session:
         flash('Please login to add item.')
         return redirect(url_for('/login'))
@@ -127,18 +168,29 @@ def addItem():
         session.add(newItem)
         session.commit()
         flash('New item is added!')
-        return redirect(url_for('showItems', category_name=new_category.name))
+        return redirect(url_for('show_items', category_name=new_category.name))
     else:
-        categories = getAllCategories()
+        categories = get_all_categories()
         return render_template('newItem.html', categories=categories)
 
 
 # Edit a selected item
 @app.route('/catalog/<item_name>/edit', methods=['GET', 'POST'])
-def editItem(item_name):
+def edit_item(item_name):
+    """Edit a given item.
+
+    Args:
+        item_name: name of the item.
+
+    Returns:
+        If edit form is submitted: returns catalog page with
+        the selected category. If edit is canceled, returns
+        catalog page. Otherwise, show the edit form with the
+        selected item.
+    """
     category, item = session.query(Category, Item).filter(
         Category.id == Item.category_id, Item.name == item_name).first()
-    categories = getAllCategories()
+    categories = get_all_categories()
     if request.method == 'POST':
         item.name = request.form['itemName']
         item.description = request.form['itemDescription']
@@ -153,7 +205,7 @@ def editItem(item_name):
             session.commit()
             flash('Item %s has been modified!' % item.name)
             return redirect(
-                url_for('showItems', category_name=new_category.name))
+                url_for('show_items', category_name=new_category.name))
         else:
             flash('Please input title of the item and select category.')
             return render_template(
@@ -165,30 +217,38 @@ def editItem(item_name):
             category_name=category.name, item=item)
 
 
-# Delete a selected item
 @app.route('/catalog/<item_name>/delete', methods=['GET', 'POST'])
-def deleteItem(item_name):
+def delete_item(item_name):
+    """Delete selected item.
+
+    Args:
+        item_name: name of the selected item.
+
+    Returns:
+        Catalog page after confirmation of deletion or cancellation.
+    """
     category, item = session.query(Category, Item).filter(
         Category.id == Item.category_id, Item.name == item_name).first()
     if request.method == 'POST':
         session.delete(item)
         session.commit()
         flash("Item %s has been deleted!" % category.name)
-        return redirect(url_for('showItems', category_name=category.name))
+        return redirect(url_for('show_items', category_name=category.name))
     else:
         return render_template(
             'deleteItem.html', category_name=category.name, item=item)
 
 
-# JSON for API
 @app.route('/catalog/<int:category_id>/item/JSON')
-def categoryItemsJSON(category_id):
+def categoryitemsjson(category_id):
+    """Fetch JSON for selected category"""
     items = session.query(Item).filter_by(category_id=category_id).all()
     return jsonify(CategoryItems=[i.serialize for i in items])
 
 
 @app.route('/catalog/JSON/')
-def catalogJSON():
+def catalogjson():
+    """Fetch JSON for all items in all categories"""
     all_items = session.query(Category, Item).filter(
         Category.id == Item.category_id).all()
     return jsonify(
@@ -196,17 +256,17 @@ def catalogJSON():
             "items": i[1].serialize}) for i in all_items])
 
 
-# JSON for admin purposes
 @app.route('/users/JSON')
-def userJSON():
+def userjson():
+    """Fetch JSON for all users"""
     users = session.query(User).all()
     return jsonify(Users=[u.serialize for u in users])
 
 
-# User login page.
-# Create unique login state variable to pass on for authentication
 @app.route('/login/')
-def showLogin():
+def show_login():
+    """Create session state variable and pass it to login page."""
+    # Create unique login state variable to pass on for authentication
     state = ''.join(
         random.choice(
             string.ascii_uppercase + string.digits) for i in xrange(32))
@@ -214,9 +274,20 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
-# Login using google+ API
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    """Login using google+ API
+
+    Use google API to upgrade authorization code to access token.
+    Use the access_token to obtain user information.
+
+    Raises:
+        FlowExchangeError: an error when upgrade of authorization
+        code fails
+
+    Returns:
+        String of html code for redirecting to catalog page
+    """
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -232,7 +303,7 @@ def gconnect():
     except FlowExchangeError:
         response = make_response(
             json.dumps('Failed to upgrade the authorization code.'), 401)
-        request.headers['Content-Type'] = 'application/json'
+        response.headers['Content-Type'] = 'application/json'
         return response
 
     # Use access code to retrieve user info
@@ -288,9 +359,9 @@ def gconnect():
     login_session['email'] = data['email']
     login_session['provider'] = 'google'
 
-    user_id = getUserID(login_session)
+    user_id = get_userid(login_session)
     if user_id is None:
-        user_id = createUser(login_session)
+        user_id = create_user(login_session)
     login_session['user_id'] = user_id
 
     output = ''
@@ -306,9 +377,17 @@ def gconnect():
     return output
 
 
-# Login using Facebook
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
+    """Login using Facebook API.
+
+    Exchange an short term code for long term access token through
+    Facebook API. Retrieve user name, email as well as picture through
+    separte Facebook API calls.
+
+    Returns:
+        String of html code for redirecting.
+    """
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -329,8 +408,7 @@ def fbconnect():
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
 
-    # Strip expired tag from access token
-    token = result.split('&')[0]
+    token = result.split('&')[0]  # Strip expired tag from access token
     login_session['access_token'] = token.split('=')[1]
 
     # Use token to get user info through API
@@ -365,10 +443,10 @@ def fbconnect():
         if 'url' in data['data']:
             login_session['picture'] = data['data']['url']
 
-    user_id = getUserID(login_session)
+    user_id = get_userid(login_session)
 
     if not user_id:
-        user_id = createUser(login_session)
+        user_id = create_user(login_session)
     login_session['user_id'] = user_id
 
     output = ''
@@ -388,6 +466,15 @@ def fbconnect():
 
 @app.route('/logout')
 def disconnect():
+    """Log out
+
+    Disconnect from login session provider.
+    Delete variables for this login session.
+    Indicate use is logged out.
+
+    Returns:
+        Catalog page
+    """
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
             flash('Disconnecting from Google...')
@@ -403,12 +490,12 @@ def disconnect():
         flash('You have successfully logged out.')
     else:
         flash('You are not logged in.')
-    return redirect(url_for('showCatalog'))
+    return redirect(url_for('show_catalog'))
 
 
-# Revoke google+ access code when logging out
 @app.route('/gdisconnect/')
 def gdisconnect():
+    """Disconnect from Google+."""
     # Only discoonnect a connected user
     access_token = login_session.get('access_token')
     if access_token is None:
@@ -418,6 +505,7 @@ def gdisconnect():
         return response
     del login_session['access_token']
     del login_session['gplus_id']
+    # Revoke google+ access code when logging out
     url = "https://accounts.google.com/o/oauth2/revoke?token=%s" % access_token
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
@@ -433,9 +521,9 @@ def gdisconnect():
         return response
 
 
-# Revoke FB access code when logging out
 @app.route('/fbdisconnect/')
 def fbdisconnect():
+    """Disconnect from FB."""
     facebook_id = login_session['facebook_id']
     access_token = login_session['access_token']
 
@@ -443,6 +531,8 @@ def fbdisconnect():
         'https://graph.facebook.com/%s/'
         'permissions?access_token=%s') % (facebook_id, access_token)
     h = httplib2.Http()
+
+    # Revoke FB access code when logging out
     result = h.request(url, 'DELETE')[1]
     del login_session['facebook_id']
     del login_session['access_token']
