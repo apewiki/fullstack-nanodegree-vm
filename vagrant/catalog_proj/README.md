@@ -1,6 +1,7 @@
 ## To run the program, please follow the procedures below:
-* Clone https://github.com/apewiki/fullstack-nanodegree-vm.git
-```git clone https://github.com/apewiki/fullstack-nanodegree-vm.git mydirectory
+* Clone the project
+```
+git clone https://github.com/apewiki/fullstack-nanodegree-vm.git mydir
 ```
 * Install Vagrant
 * cd vagrant directory and bring up VirtualBox
