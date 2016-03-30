@@ -1,20 +1,28 @@
 ## To run the program, please follow the procedures below:
-* git clone https://github.com/apewiki/fullstack-nanodegree-vm.git
+* Clone https://github.com/apewiki/fullstack-nanodegree-vm.git
+```git clone https://github.com/apewiki/fullstack-nanodegree-vm.git mydirectory
+```
 * Install Vagrant
-* Run 'vagrant up' in vagrant directory
-* Run 'vagrant ssh'
+* cd vagrant directory and bring up VirtualBox
+```
+vagrant up
+```
+```
+vagrant ssh
+```
 * cd /vagrant
 * cd catalog_proj
 
-1. Database setup
+##Start the app
+* Database setup
 ```
 python database.py
 ```
-2. Populate databse with some records
+* Populate databse with some records
 ```
 python populateItems.py
 ```
-3. Start the app
+* Start the app
 ```
 python catalog.py
 ```
