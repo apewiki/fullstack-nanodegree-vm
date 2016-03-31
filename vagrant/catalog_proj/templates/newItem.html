@@ -10,18 +10,8 @@
 				return true;
 			}
 		}
-		function chooseFile() {
-			var names = document.getElementById('imgFile')
-			if ('files' in names) {
-				if (names.files.length == 0) {
-					alert('Select one file');
-				} else {
-					document.getElementById('imageFileName').value = names.files[0].name
-				}
-			}
-		}
 	</script>
-	<form action = "{{url_for('add_item', categories = categories)}}" method = 'POST'>
+	<form action = "{{url_for('add_item', categories = categories)}}" method = 'POST' enctype='multipart/form-data'>
 		<h2>Title</h2>
 		<input type = 'text' name = 'itemName' id = 'newItemTitle'>
 		<br>
@@ -30,8 +20,7 @@
 		<h2>Price</h2>
 		<input type = 'text' name = 'itemPrice'>
 		<h2>Image file name</h2>
-		<input type = 'file' id = 'imgFile' onchange = 'chooseFile()'>
-		<input type = 'text' name = 'imageFile' id = 'imageFileName'>
+		<input type = 'file' id = 'imgFile' name = 'imgFileName'>
 		<h2>Category</h2>
 		<select name = 'selectedCategory'>
 			{% for c in categories %}

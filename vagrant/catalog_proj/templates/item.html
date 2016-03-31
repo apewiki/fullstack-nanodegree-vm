@@ -6,7 +6,7 @@
 	{{item.description}}
 	<br>
 	{% if showPic %}
-		<img src="/static/images/{{item.picture}}">
+		<img src="{{url_for('uploaded_file', filename = item.picture)}}">
 	{% endif %}
 	<br>
 	<h3>price: </h3>

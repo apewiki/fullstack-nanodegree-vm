@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect
-from flask import url_for, jsonify, flash
+from flask import url_for, jsonify, flash, send_from_directory
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func, desc
@@ -15,6 +15,8 @@ import httplib2
 import json
 from flask import make_response
 import requests
+import os
+from werkzeug import secure_filename
 
 app = Flask(__name__)
 
@@ -26,6 +28,28 @@ session = DBSession()
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = 'spotscatalog'
+
+UPLOAD_FOLDER = 'static/images'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+
+def allowed_file(filename):
+    return ('.' in filename and
+            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS)
+
+
+def save_file(myfile):
+    if myfile and allowed_file(myfile.filename):
+        filename = secure_filename(myfile.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        myfile.save(filepath)
+        return filename
+    return None
+
+
+@app.route('/static/images/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 def get_category(category_name):
@@ -132,7 +156,7 @@ def show_item(category_name, item_name):
     c = get_category(category_name)
     i = session.query(Item).filter_by(name=item_name).first()
     showPic = False
-    if i.picture and len(i.picture) > 0 and i.picture.endswith('jpg'):
+    if i.picture and len(i.picture) > 0:
         showPic = True
     # Show edit/delete link if user is logged in
     if 'user_id' in login_session:
@@ -142,6 +166,12 @@ def show_item(category_name, item_name):
         allow_edit=allow_edit, showPic=showPic)
 
 
+def authenticate():
+    if 'user_id' not in login_session:
+        flash('Please login to add item.')
+        return redirect(url_for('/login'))
+
+
 @app.route('/catalog/new', methods=['GET', 'POST'])
 def add_item():
     """Add new item.
@@ -149,9 +179,7 @@ def add_item():
     Returns:
         Category page if new item is submitted otherwise new entry form
     """
-    if 'user_id' not in login_session:
-        flash('Please login to add item.')
-        return redirect(url_for('/login'))
+    authenticate()
     if request.method == 'POST':
         selectedCategory = str(request.form['selectedCategory'])
 
@@ -160,10 +188,12 @@ def add_item():
         if new_category:
             category_id = new_category.id
 
+        newfile = request.files['imgFileName']
+
         newItem = Item(
             name=request.form['itemName'],
             description=request.form['itemDescription'],
-            category_id=category_id, picture=request.form['imageFile'],
+            category_id=category_id, picture=save_file(newfile),
             price=request.form['itemPrice'], user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
@@ -188,13 +218,15 @@ def edit_item(item_name):
         catalog page. Otherwise, show the edit form with the
         selected item.
     """
+    authenticate()
     category, item = session.query(Category, Item).filter(
         Category.id == Item.category_id, Item.name == item_name).first()
     categories = get_all_categories()
     if request.method == 'POST':
         item.name = request.form['itemName']
         item.description = request.form['itemDescription']
-        item.picture = request.form['itemImageFile']
+        pictureFile = request.files['itemImgFileName']
+        item.picture = save_file(pictureFile)
         item.price = request.form['itemPrice']
         new_category = session.query(Category).filter_by(
             name=request.form['itemCategory']).first()
@@ -227,6 +259,7 @@ def delete_item(item_name):
     Returns:
         Catalog page after confirmation of deletion or cancellation.
     """
+    authenticate()
     category, item = session.query(Category, Item).filter(
         Category.id == Item.category_id, Item.name == item_name).first()
     if request.method == 'POST':
@@ -542,4 +575,5 @@ def fbdisconnect():
 if __name__ == '__main__':
     app.debug = True
     app.secret_key = "some_exe_secret"
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.run(host='0.0.0.0', port=8000)
