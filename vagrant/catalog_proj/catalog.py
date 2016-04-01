@@ -603,7 +603,7 @@ def fbdisconnect():
     return "You are logged out."
 
 if __name__ == '__main__':
-    app.debug = True
+    #app.debug = True
     app.secret_key = "some_exe_secret"
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.run(host='0.0.0.0', port=8000)
