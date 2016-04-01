@@ -6,6 +6,7 @@ from sqlalchemy import func, desc
 from database import Base, Category, Item, User
 
 from flask import session as login_session
+from functools import wraps
 import random
 import string
 
@@ -34,11 +35,27 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 
 def allowed_file(filename):
+    """Check acceptable file extension.
+
+    Args:
+        filename: file name
+
+    Return:
+        True/False the file can be accepted
+    """
     return ('.' in filename and
             filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS)
 
 
 def save_file(myfile):
+    """Upload file and save on server.
+
+    Args:
+        myfile: file name
+
+    Returns:
+        Saved file name or None if saving failed
+    """
     if myfile and allowed_file(myfile.filename):
         filename = secure_filename(myfile.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -49,6 +66,14 @@ def save_file(myfile):
 
 @app.route('/static/images/<filename>')
 def uploaded_file(filename):
+    """Show uploaded file
+
+    Args:
+        filename: file name
+
+    Returns:
+        The page showing the image filename
+    """
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
@@ -166,20 +191,25 @@ def show_item(category_name, item_name):
         allow_edit=allow_edit, showPic=showPic)
 
 
-def authenticate():
-    if 'user_id' not in login_session:
-        flash('Please login to add item.')
-        return redirect(url_for('/login'))
+def authenticate_modify(func):
+    @wraps(func)
+    def func_wrapper(*args, **kwargs):
+        """Decorator for login and edit."""
+        if 'user_id' not in login_session:
+            flash('Please login to add/edit/delete items.')
+            return redirect(url_for('show_login', next=request.url))
+        return func(*args, **kwargs)
+    return func_wrapper
 
 
 @app.route('/catalog/new', methods=['GET', 'POST'])
+@authenticate_modify
 def add_item():
     """Add new item.
 
     Returns:
         Category page if new item is submitted otherwise new entry form
     """
-    authenticate()
     if request.method == 'POST':
         selectedCategory = str(request.form['selectedCategory'])
 
@@ -206,6 +236,7 @@ def add_item():
 
 # Edit a selected item
 @app.route('/catalog/<item_name>/edit', methods=['GET', 'POST'])
+@authenticate_modify
 def edit_item(item_name):
     """Edit a given item.
 
@@ -218,7 +249,6 @@ def edit_item(item_name):
         catalog page. Otherwise, show the edit form with the
         selected item.
     """
-    authenticate()
     category, item = session.query(Category, Item).filter(
         Category.id == Item.category_id, Item.name == item_name).first()
     categories = get_all_categories()
@@ -250,6 +280,7 @@ def edit_item(item_name):
 
 
 @app.route('/catalog/<item_name>/delete', methods=['GET', 'POST'])
+@authenticate_modify
 def delete_item(item_name):
     """Delete selected item.
 
@@ -259,13 +290,12 @@ def delete_item(item_name):
     Returns:
         Catalog page after confirmation of deletion or cancellation.
     """
-    authenticate()
     category, item = session.query(Category, Item).filter(
         Category.id == Item.category_id, Item.name == item_name).first()
     if request.method == 'POST':
         session.delete(item)
         session.commit()
-        flash("Item %s has been deleted!" % category.name)
+        flash("Item %s has been deleted!" % item.name)
         return redirect(url_for('show_items', category_name=category.name))
     else:
         return render_template(
