@@ -1,0 +1,244 @@
+{
+  "Categories": [
+    {
+      "id": 1,
+      "items": {
+        "category_id": 1,
+        "date_added": "Thu, 24 Mar 2016 15:41:08 GMT",
+        "description": "Waterproof, moisture wicking, Vibram outsole for excellent grip and shock absorbtion",
+        "id": 1,
+        "name": "Asolo Neutron",
+        "picture": "asolo.jpg",
+        "price": "180",
+        "user_id": 1
+      },
+      "name": "Hiking Boots",
+      "user_id": null
+    },
+    {
+      "id": 1,
+      "items": {
+        "category_id": 1,
+        "date_added": "Thu, 24 Mar 2016 15:41:08 GMT",
+        "description": "Waterproof, moisture wicking, Rubber toe cap for durability, HANWAG IceGrip lugged rubber outsole",
+        "id": 2,
+        "name": "Hanwag Xerro",
+        "picture": "hanwag.jpg",
+        "price": "150",
+        "user_id": 1
+      },
+      "name": "Hiking Boots",
+      "user_id": null
+    },
+    {
+      "id": 2,
+      "items": {
+        "category_id": 2,
+        "date_added": "Thu, 24 Mar 2016 15:41:08 GMT",
+        "description": "Three-section Z-Pole folding design with speed cone deployment",
+        "id": 3,
+        "name": "Black Diamond Ultra Distance Z Pole",
+        "picture": "bdz.jpg",
+        "price": "120",
+        "user_id": 1
+      },
+      "name": "Hiking Poles",
+      "user_id": null
+    },
+    {
+      "id": 2,
+      "items": {
+        "category_id": 2,
+        "date_added": "Thu, 24 Mar 2016 15:41:09 GMT",
+        "description": "Ultralight carbon fiber shaft is incredibly strong, Power Lock II locking mechanism provides quick and secure height adjustment",
+        "id": 4,
+        "name": "Komperdell Carbon Approach Vario",
+        "picture": "komperdell.jpg",
+        "price": "150",
+        "user_id": 1
+      },
+      "name": "Hiking Poles",
+      "user_id": null
+    },
+    {
+      "id": 3,
+      "items": {
+        "category_id": 3,
+        "date_added": "Thu, 24 Mar 2016 15:41:09 GMT",
+        "description": "Ultralight and supportive, this pack offers the best of both worlds; its airy suspension is both light and comfortable for superlight backpacking and thru-hiking",
+        "id": 5,
+        "name": "Osprey Exos",
+        "picture": "ospre2.jpg",
+        "price": "190",
+        "user_id": 1
+      },
+      "name": "Backpacks",
+      "user_id": null
+    },
+    {
+      "id": 3,
+      "items": {
+        "category_id": 3,
+        "date_added": "Thu, 24 Mar 2016 15:41:09 GMT",
+        "description": "Loaded-up with exterior stretch pockets, a side-access sleeping bag compartment and top and panel loading access, this multiday pack keeps your gear comfortably stowed and easy to access on the trail.",
+        "id": 6,
+        "name": "Kelty Catalyst",
+        "picture": "kelty.jpg",
+        "price": "179.99",
+        "user_id": 1
+      },
+      "name": "Backpacks",
+      "user_id": null
+    },
+    {
+      "id": 4,
+      "items": {
+        "category_id": 4,
+        "date_added": "Thu, 24 Mar 2016 15:41:09 GMT",
+        "description": "These no-itch SmartWool hiking socks maintain softness and shape through seasons of wear and washing",
+        "id": 7,
+        "name": "Smartwool Hiking Socks",
+        "picture": "smartwool.jpg",
+        "price": "12",
+        "user_id": 1
+      },
+      "name": "Hiking Socks",
+      "user_id": null
+    },
+    {
+      "id": 4,
+      "items": {
+        "category_id": 4,
+        "date_added": "Thu, 24 Mar 2016 15:41:09 GMT",
+        "description": "Made in Vermont with legendary Darn Tough construction and performance fit to keep socks in place all day, with no slipping, bunching, blisters or hot spots",
+        "id": 8,
+        "name": "Darn Tough CoolMax Micro Crew Cushion Socks",
+        "picture": "darn.jpg",
+        "price": "10",
+        "user_id": 1
+      },
+      "name": "Hiking Socks",
+      "user_id": null
+    },
+    {
+      "id": 3,
+      "items": {
+        "category_id": 3,
+        "date_added": "Thu, 24 Mar 2016 16:03:57 GMT",
+        "description": "Winner of Backpacker magazine's 2015 Editors' Choice Gold Award, this extended-trip pack has a fully customizable suspension that adapts to your body for a light and agile feel with a heavy load. Revised again!",
+        "id": 9,
+        "name": "Gregory Bartoro",
+        "picture": "gregory.jpg",
+        "price": "319",
+        "user_id": 1
+      },
+      "name": "Backpacks",
+      "user_id": null
+    },
+    {
+      "id": 3,
+      "items": {
+        "category_id": 3,
+        "date_added": "Thu, 24 Mar 2016 16:13:13 GMT",
+        "description": "Slip on this amazingly comfortable pack and enjoy the freedom of a custom, heat-moldable hipbelt and a superb, lightweight design for enhanced load support on extended backcountry adventures.",
+        "id": 10,
+        "name": "Osprey Aether",
+        "picture": "ospreyaether.jpg",
+        "price": "289.95",
+        "user_id": 1
+      },
+      "name": "Backpacks",
+      "user_id": null
+    },
+    {
+      "id": 4,
+      "items": {
+        "category_id": 4,
+        "date_added": "Mon, 28 Mar 2016 16:07:37 GMT",
+        "description": "The Cool Lite Hiker Pro Crew Socks will keep your feet cool, dry and blister-free, no matter how many miles are planned for the day.",
+        "id": 11,
+        "name": "Wigwam Cool Lite",
+        "picture": "wigwam.jpg",
+        "price": "15",
+        "user_id": 1
+      },
+      "name": "Hiking Socks",
+      "user_id": null
+    },
+    {
+      "id": 1,
+      "items": {
+        "category_id": 1,
+        "date_added": "Mon, 28 Mar 2016 17:19:46 GMT",
+        "description": "Winner of the 2014 OudoorGearLab Editors' Choice award, these women's hiking boots provide waterproof protection and excellent support at a low weight for weekend backpacking trips or long day hikes.",
+        "id": 12,
+        "name": "Lowa Renegade",
+        "picture": "lowa.jpg",
+        "price": "240",
+        "user_id": 1
+      },
+      "name": "Hiking Boots",
+      "user_id": null
+    },
+    {
+      "id": 1,
+      "items": {
+        "category_id": 1,
+        "date_added": "Mon, 28 Mar 2016 17:35:24 GMT",
+        "description": "With tough leather construction and waterproof/breathable Gore-Tex\u00ae protection, these women's mountaineering boots offer reliable performance for climbing and backpacking on mixed alpine terrain.",
+        "id": 13,
+        "name": "Lowa Mountain",
+        "picture": "lowa_mountain.jpg",
+        "price": "390",
+        "user_id": 2
+      },
+      "name": "Hiking Boots",
+      "user_id": null
+    },
+    {
+      "id": 2,
+      "items": {
+        "category_id": 2,
+        "date_added": "Mon, 28 Mar 2016 17:37:24 GMT",
+        "description": "These lightweight women's poles feature Aergon grips known for their edgeless shape and comfortable hand positioning. Plus, an internal tension cord automatically boosts durability at any length.",
+        "id": 14,
+        "name": "Leki Micro",
+        "picture": "leki.jpg",
+        "price": "199.99",
+        "user_id": 2
+      },
+      "name": "Hiking Poles",
+      "user_id": null
+    },
+    {
+      "id": 3,
+      "items": {
+        "category_id": 3,
+        "date_added": "Mon, 28 Mar 2016 21:18:28 GMT",
+        "description": "Lightweight with a women-specific design, this versatile expanding pack lets you comfortably tackle everything from gear-heavy weekend trips to lightweight multiday treks without changing packs.",
+        "id": 15,
+        "name": "Deuter ACT",
+        "picture": "deuter.jpg",
+        "price": "189",
+        "user_id": 2
+      },
+      "name": "Backpacks",
+      "user_id": null
+    },
+    {
+      "id": 1,
+      "items": {
+        "category_id": 1,
+        "date_added": "Fri, 01 Apr 2016 00:12:46 GMT",
+        "description": "test",
+        "id": 16,
+        "name": "test",
+        "picture": "asolo.jpg",
+        "price": "100",
+        "user_id": 1
+      },
+      "name": "Hiking Boots",
+      "user_id": null
+    }
+  ]
+}

@@ -51,7 +51,7 @@ class Item(Base):
 	price = Column(String(50))
 	picture = Column(String(250))
 	category_id = Column(Integer, ForeignKey('category.id'))
-	category = relationship(Category)
+	category = relationship(Category, cascade="delete")
 	user_id = Column(Integer, ForeignKey('user.id'))
 	user = relationship(User)
 	date_added = Column(DateTime, default = func.now())

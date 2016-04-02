@@ -1,0 +1,16 @@
+{
+  "Users": [
+    {
+      "email": "qzhujw@gmail.com",
+      "id": 1,
+      "name": "Qin Zhu",
+      "picture": "https://lh4.googleusercontent.com/-lSwcjfDhIUE/AAAAAAAAAAI/AAAAAAAAKs0/wYPrTd5PyLg/photo.jpg"
+    },
+    {
+      "email": "azj123@gmail.com",
+      "id": 2,
+      "name": "Alexander Zhang",
+      "picture": "https://scontent.xx.fbcdn.net/hprofile-xtf1/v/t1.0-1/s200x200/10557213_10204595384111012_3666634306742503989_n.jpg?oh=7f3c9ef2760c739bd6c2538c9f042ae3&oe=5789156E"
+    }
+  ]
+}
